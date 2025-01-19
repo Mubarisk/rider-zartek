@@ -21,7 +21,6 @@ class DriverRideViewSet(ModelViewSet):
 
     @action(methods=["get"], detail=False, url_path="my-rides")
     def my_rides(self, request):
-        print("my_rides")
         queryset = Ride.objects.filter(driver=request.user).order_by(
             "-created_at"
         )
@@ -65,28 +64,7 @@ class DriverRideViewSet(ModelViewSet):
 
     @action(detail=False, methods=["list"])
     def list_rides(self, request, *args, **kwargs):
-        # queryset = super().get_queryset().annotate(
-        #     distance=self.calculate_distance(
-        #         request.user.lat,
-        #         request.user.long,
-        #         "pickup_location_lat",
-        #         "pickup_location_lon",
-        #     )
-        # ).order_by("distance")
-        # lat = self.request.user.lat
-        # long = self.request.user.long
-        # data = sorted(
-        #     queryset,
-        #     key=lambda x: self.calculate_distance(
-        #         lat, long, x.pickup_location_lat, x.pickup_location_lon
-        #     ),
-        # )
-        # serializer = self.get_serializer(queryset, many=True)
-        # return SuccessResponse(data=serializer.data)
-
         if not self.request.user.lat or not self.request.user.long:
-            print(self.request.user.lat, self.request.user.long)    
-            print("No location")
             data = self.get_serializer(self.get_queryset(), many=True).data
             return SuccessResponse(data=data)
 
@@ -121,7 +99,6 @@ class DriverRideViewSet(ModelViewSet):
         """
         Calculate the Haversine distance between two points on the earth
         """
-        print(lat1, lon1, lat2, lon2)
         # Convert decimal degrees to radians
         lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
 
@@ -134,5 +111,4 @@ class DriverRideViewSet(ModelViewSet):
             + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
         )
         c = 2 * math.asin(math.sqrt(a))
-        print(c * 6371)
         return c * 6371
