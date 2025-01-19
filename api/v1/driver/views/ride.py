@@ -15,9 +15,7 @@ from django.db.models.functions import ACos, Cos, Radians, Sin
 class DriverRideViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated, IsDriver]
     serializer_class = DriverRideSerializer
-    queryset = Ride.objects.filter(
-        status=Ride.RideStatus.REQUESTED, driver__isnull=True
-    ).order_by("-created_at")
+    queryset = Ride.objects.all().order_by("-created_at")
 
     @action(methods=["get"], detail=False, url_path="my-rides")
     def my_rides(self, request):
@@ -56,7 +54,7 @@ class DriverRideViewSet(ModelViewSet):
                     return ErrorResponse(message="Ride already accepted")
                 ride.driver = request.user
             elif ride.driver != request.user:
-                return ErrorResponse(message="Unauthorized")
+                return ErrorResponse(message="Unauthorized", status_code=403)
 
             ride.save()
             return SuccessResponse(message="Ride status updated successfully")

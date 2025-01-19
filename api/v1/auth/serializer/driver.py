@@ -17,7 +17,7 @@ class DriverSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         validated_data = super().validate(attrs)
-        email_query = User.objects.filter(email=validated_data["email"])
+        email_query = User.objects.filter(email=validated_data.get("email"))
         if self.instance:
             email_query = email_query.exclude(id=self.instance.id)
         if email_query.exists():
