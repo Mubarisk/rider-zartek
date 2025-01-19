@@ -63,14 +63,16 @@ class DriverRideViewSet(ModelViewSet):
     @action(detail=False, methods=["list"])
     def list_rides(self, request, *args, **kwargs):
         if not self.request.user.lat or not self.request.user.long:
-            data = self.get_serializer(self.get_queryset(), many=True).data
+            data = self.get_serializer(
+                self.get_queryset().filter(driver__isnull=True), many=True
+            ).data
             return SuccessResponse(data=data)
 
         user_lat = self.request.user.lat
         user_lon = self.request.user.long
         queryset = (
             super()
-            .get_queryset()
+            .get_queryset().filter(driver__isnull=True)
             .annotate(
                 distance=ExpressionWrapper(
                     6371
