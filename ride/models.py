@@ -7,6 +7,7 @@ from user.models import User
 class Ride(models.Model):
     class RideStatus(models.TextChoices):
         REQUESTED = "REQUESTED", "Requested"
+        ACCEPTED = "ACCEPTED", "Accepted"
         IN_PROGRESS = "IN_PROGRESS", "In Progress"
         COMPLETED = "COMPLETED", "Completed"
         CANCELLED = "CANCELLED", "Cancelled"
@@ -32,6 +33,5 @@ class Ride(models.Model):
     current_location_lon = models.DecimalField(
         max_digits=9, decimal_places=6, null=True, blank=True
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
-    

@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "user",
+    "ride",
 ]
 
 MIDDLEWARE = [
@@ -121,6 +122,7 @@ SWAGGER_SETTINGS = {
         "api_key": {"type": "apiKey", "in": "header", "name": "Authorization"}
     },
     "basePath": "",
+    "PERSIST_AUTH": True,
 }
 
 # JWT Auth
@@ -212,4 +214,3 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
