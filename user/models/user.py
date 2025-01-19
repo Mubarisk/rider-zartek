@@ -20,6 +20,8 @@ class User(AbstractUser):
     user_type = models.CharField(
         max_length=20, choices=UserTypes.choices, default=UserTypes.RIDER
     )
+    lat = models.DecimalField(max_digits=20, decimal_places=18, default=0)
+    long = models.DecimalField(max_digits=20, decimal_places=18, default=0)
 
     def __str__(self):
         return self.username

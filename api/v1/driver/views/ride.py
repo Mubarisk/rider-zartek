@@ -7,15 +7,21 @@ from rider.config.response import SuccessResponse, ErrorResponse
 from rest_framework.decorators import action
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+import math
+from django.db.models import F, ExpressionWrapper, FloatField
+from django.db.models.functions import ACos, Cos, Radians, Sin
 
 
 class DriverRideViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated, IsDriver]
     serializer_class = DriverRideSerializer
-    queryset = Ride.objects.all()
+    queryset = Ride.objects.filter(
+        status=Ride.RideStatus.REQUESTED, driver__isnull=True
+    ).order_by("-created_at")
 
-    @action(methods=["get"], detail=False)
-    def list_rides(self, request):
+    @action(methods=["get"], detail=False, url_path="my-rides")
+    def my_rides(self, request):
+        print("my_rides")
         queryset = Ride.objects.filter(driver=request.user).order_by(
             "-created_at"
         )
@@ -56,3 +62,77 @@ class DriverRideViewSet(ModelViewSet):
             ride.save()
             return SuccessResponse(message="Ride status updated successfully")
         return ErrorResponse(message="Invalid status")
+
+    @action(detail=False, methods=["list"])
+    def list_rides(self, request, *args, **kwargs):
+        # queryset = super().get_queryset().annotate(
+        #     distance=self.calculate_distance(
+        #         request.user.lat,
+        #         request.user.long,
+        #         "pickup_location_lat",
+        #         "pickup_location_lon",
+        #     )
+        # ).order_by("distance")
+        # lat = self.request.user.lat
+        # long = self.request.user.long
+        # data = sorted(
+        #     queryset,
+        #     key=lambda x: self.calculate_distance(
+        #         lat, long, x.pickup_location_lat, x.pickup_location_lon
+        #     ),
+        # )
+        # serializer = self.get_serializer(queryset, many=True)
+        # return SuccessResponse(data=serializer.data)
+
+        if not self.request.user.lat or not self.request.user.long:
+            print(self.request.user.lat, self.request.user.long)    
+            print("No location")
+            data = self.get_serializer(self.get_queryset(), many=True).data
+            return SuccessResponse(data=data)
+
+        user_lat = self.request.user.lat
+        user_lon = self.request.user.long
+        queryset = (
+            super()
+            .get_queryset()
+            .annotate(
+                distance=ExpressionWrapper(
+                    6371
+                    * ACos(
+                        Cos(Radians(user_lat))
+                        * Cos(Radians(F("pickup_location_lat")))
+                        * Cos(
+                            Radians(F("pickup_location_lon"))
+                            - Radians(user_lon)
+                        )
+                        + Sin(Radians(user_lat))
+                        * Sin(Radians(F("pickup_location_lat")))
+                    ),
+                    output_field=FloatField(),
+                )
+            )
+            .order_by("distance")
+        )
+
+        serializer = self.get_serializer(queryset, many=True)
+        return SuccessResponse(data=serializer.data)
+
+    def calculate_distance(self, lat1, lon1, lat2, lon2):
+        """
+        Calculate the Haversine distance between two points on the earth
+        """
+        print(lat1, lon1, lat2, lon2)
+        # Convert decimal degrees to radians
+        lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+
+        # Haversine formula
+        dlat = lat2 - lat1
+        dlon = lon2 - lon1
+
+        a = (
+            math.sin(dlat / 2) ** 2
+            + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+        )
+        c = 2 * math.asin(math.sqrt(a))
+        print(c * 6371)
+        return c * 6371

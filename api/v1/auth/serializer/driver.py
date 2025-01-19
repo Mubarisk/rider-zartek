@@ -5,7 +5,14 @@ from user.models import User
 class DriverSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["email", "password", "first_name", "last_name"]
+        fields = [
+            "email",
+            "password",
+            "first_name",
+            "last_name",
+            "lat",
+            "long",
+        ]
         extra_kwargs = {"password": {"write_only": True}}
 
     def validate(self, attrs):

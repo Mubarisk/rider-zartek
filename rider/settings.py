@@ -113,7 +113,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 20,
-    "EXCEPTION_HANDLER": "rider.config.exception_handler.CustomExceptionHandler",
+    # "EXCEPTION_HANDLER": "rider.config.exception_handler.CustomExceptionHandler",
 }
 
 # Swagger settings
@@ -121,7 +121,6 @@ SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {
         "api_key": {"type": "apiKey", "in": "header", "name": "Authorization"}
     },
-    "basePath": "",
     "PERSIST_AUTH": True,
 }
 
