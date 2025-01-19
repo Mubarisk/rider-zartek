@@ -9,7 +9,11 @@ class RideSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ride
-        exclude = ("created_at", "updated_at", "rider", "status")
+        exclude = (
+            "created_at",
+            "updated_at",
+            "rider",
+        )
         read_only_fields = (
             "id",
             "status",
