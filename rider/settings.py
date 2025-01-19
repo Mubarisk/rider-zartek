@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "drf_yasg",
     "rest_framework",
     "rest_framework_simplejwt",
+    "channels",
     "user",
     "ride",
 ]
@@ -48,6 +49,15 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+ASGI_APPLICATION = "rider.asgi.application"
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],  # Redis host and port
+        },
+    },
+}
 ROOT_URLCONF = "rider.urls"
 AUTH_USER_MODEL = "user.User"
 
@@ -178,18 +188,6 @@ STATIC_ROOT = BASE_DIR / "static"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Celery
-# BROKER_URL = 'redis://localhost:6379/0'
-# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-# CELERY_ACCEPT_CONTENT = ['json']
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_DEFAULT_QUEUE = DEFAULT_CELERY_QUEUE
-# CELERY_TRACK_STARTED = True
-# CELERY_QUEUES = (
-#     Queue(DEFAULT_CELERY_QUEUE, routing_key='task.#'),
-# )
-# CELERY_TIMEZONE = "Asia/Kolkata"
 
 
 # Internationalization
